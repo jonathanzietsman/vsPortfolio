@@ -8,6 +8,14 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    title: 'vsPortfolio',
+    description:
+      'VSCode extension to track and deploy your Coolify applications.',
+    logo: '/logos/vscode3-svgrepo-com.svg',
+    link: 'https://vs-portfolio-snowy.vercel.app/',
+    slug: 'vscodeportfolio',
+  },
+  {
     title: 'ApexPOS',
     description:
       'A point-of-sale system for running a shop: ring up sales, track stock, apply promotions, and manage the cash drawer, with live analytics.',
@@ -31,12 +39,4 @@ export const projects: Project[] = [
     link: 'https://jonathanzietsman.github.io/portfolio.io/',
     slug: 'portfolio-1',
   },
-  // {
-  //   title: 'Coolify Deployments',
-  //   description:
-  //     'VSCode extension to track and deploy your Coolify applications.',
-  //   logo: '/logos/coolify.svg',
-  //   link: 'https://github.com/itsnitinr/coolify-vscode-extension',
-  //   slug: 'coolify-vscode-extension',
-  // },
 ];
