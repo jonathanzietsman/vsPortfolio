@@ -1,0 +1,42 @@
+export interface Project {
+  title: string;
+  description: string;
+  logo: string;
+  link: string;
+  slug: string;
+}
+
+export const projects: Project[] = [
+  {
+    title: 'ApexPOS',
+    description:
+      'A point-of-sale system for running a shop: ring up sales, track stock, apply promotions, and manage the cash drawer, with live analytics.',
+    logo: '/logos/thunder-sign-octagon-svgrepo-com.svg',
+    link: 'https://web-developer-bootcamp-project.vercel.app/',
+    slug: 'apexpos',
+  },
+  {
+    title: 'itHelpdesk',
+    description:
+      'A Django helpdesk where employees report IT problems and technicians prioritize, assign, and resolve them, with a full audit trail from ticket to fix.',
+    logo: '/logos/computer-svgrepo-com.svg',
+    link: 'https://jonathanzietsman.pythonanywhere.com/login/',
+    slug: 'it-helpdesk',
+  },
+  {
+    title: 'My 1st Portfolio',
+    description:
+      'An early personal portfolio built with HTML, CSS, and Bootstrap, featuring responsive layouts and sections for showcasing my projects, skills, and development experience while establishing my foundation in front-end development.',
+    logo: '/logos/portfolio-svgrepo-com (1).svg',
+    link: 'https://jonathanzietsman.github.io/portfolio.io/',
+    slug: 'portfolio-1',
+  },
+  // {
+  //   title: 'Coolify Deployments',
+  //   description:
+  //     'VSCode extension to track and deploy your Coolify applications.',
+  //   logo: '/logos/coolify.svg',
+  //   link: 'https://github.com/itsnitinr/coolify-vscode-extension',
+  //   slug: 'coolify-vscode-extension',
+  // },
+];
