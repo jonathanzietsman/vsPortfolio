@@ -32,6 +32,14 @@ export const projects: Project[] = [
     slug: 'it-helpdesk',
   },
   {
+    title: 'DevPulse',
+    description:
+      'A developer wellness and project tracker. Log coding sessions, track hours per project, and monitor mood and burnout over time.',
+    logo: '/logos/dev-to-svgrepo-com.svg',
+    link: 'https://dev-pulse-code-collage-react-projec.vercel.app/',
+    slug: 'devpulse',
+  },
+  {
     title: 'My 1st Portfolio',
     description:
       'An early personal portfolio built with HTML, CSS, and Bootstrap, featuring responsive layouts and sections for showcasing my projects, skills, and development experience while establishing my foundation in front-end development.',

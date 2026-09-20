@@ -1,8 +1,15 @@
 import { Metadata } from 'next';
-import { VscFolderOpened, VscGithub, VscLinkExternal } from 'react-icons/vsc';
+import {
+  VscFolderOpened,
+  VscGithub,
+  VscLinkExternal,
+  VscBeaker,
+} from 'react-icons/vsc';
 
 import ProjectCard from '@/components/ProjectCard';
+import SandboxCard from '@/components/SandboxCard';
 import { projects } from '@/data/projects';
+import { sandboxProjects } from '@/data/sandboxProjects';
 
 import styles from '@/styles/ProjectsPage.module.css';
 
@@ -12,6 +19,7 @@ export const metadata: Metadata = {
 
 const ProjectsPage = () => {
   const totalProjects = projects.length;
+  const totalSandbox = sandboxProjects.length;
 
   return (
     <div className={styles.page}>
@@ -25,11 +33,11 @@ const ProjectsPage = () => {
               <span className={styles.count}>{totalProjects} Projects</span>
             </div>
           </div>
-          
+
           <div className={styles.headerContent}>
             <h1 className={styles.title}>Featured Work</h1>
             <p className={styles.subtitle}>
-              A curated collection of projects I&apos;ve built. Each represents 
+              A curated collection of projects I&apos;ve built. Each represents
               a unique challenge and learning experience.
             </p>
           </div>
@@ -37,17 +45,39 @@ const ProjectsPage = () => {
 
         <div className={styles.timeline}>
           {projects.map((project, index) => (
-            <ProjectCard 
-              key={project.slug} 
+            <ProjectCard
+              key={project.slug}
               project={project}
               index={index + 1}
             />
           ))}
         </div>
 
+        {/* Sandbox */}
+        <section className={styles.sandboxSection}>
+          <div className={styles.sandboxHeader}>
+            <div className={styles.sandboxIconWrapper}>
+              <VscBeaker className={styles.sandboxIcon} size={20} />
+            </div>
+            <div className={styles.sandboxHeaderText}>
+              <h2 className={styles.sandboxTitle}>Sandbox</h2>
+              <p className={styles.sandboxSubtitle}>
+                Small experiments, early builds, and one-file toys. {totalSandbox}{' '}
+                projects — click any icon to open it.
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.sandboxGrid}>
+            {sandboxProjects.map((project) => (
+              <SandboxCard key={project.slug} project={project} />
+            ))}
+          </div>
+        </section>
+
         <footer className={styles.footer}>
           <div className={styles.footerLine} />
-          <a 
+          <a
             href="https://github.com/jonathanzietsman"
             target="_blank"
             rel="noopener noreferrer"
