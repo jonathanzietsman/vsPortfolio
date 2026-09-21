@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
 import {
+  VscBeaker,
   VscFolderOpened,
   VscGithub,
   VscLinkExternal,
-  VscBeaker,
 } from 'react-icons/vsc';
 
 import ProjectCard from '@/components/ProjectCard';
@@ -21,62 +21,120 @@ const ProjectsPage = () => {
   const totalProjects = projects.length;
   const totalSandbox = sandboxProjects.length;
 
+  const marqueeDuration = Math.max(40, totalSandbox * 3.5);
+
+  // Second row starts halfway through the list so both rows don't show
+  // the same chips lined up under each other.
+  const half = Math.ceil(totalSandbox / 2);
+  const secondRow = [
+    ...sandboxProjects.slice(half),
+    ...sandboxProjects.slice(0, half),
+  ];
+
   return (
     <div className={styles.page}>
       <div className={styles.container}>
         <header className={styles.header}>
           <div className={styles.headerTop}>
-            <div className={styles.iconWrapper}>
-              <VscFolderOpened className={styles.icon} size={24} />
-            </div>
-            <div className={styles.meta}>
-              <span className={styles.count}>{totalProjects} Projects</span>
-            </div>
+            <h1 className={styles.title}>
+              <VscFolderOpened className={styles.icon} size={26} />
+              Featured Work
+            </h1>
+            <span className={styles.count}>
+              {totalProjects} {totalProjects === 1 ? 'project' : 'projects'}
+            </span>
           </div>
 
-          <div className={styles.headerContent}>
-            <h1 className={styles.title}>Featured Work</h1>
-            <p className={styles.subtitle}>
-              A curated collection of projects I&apos;ve built. Each represents
-              a unique challenge and learning experience.
-            </p>
-          </div>
+          <p className={styles.subtitle}>
+            A curated collection of projects I&apos;ve built. Each represents a
+            unique challenge and learning experience.
+          </p>
         </header>
 
-        <div className={styles.timeline}>
+        {/* First card is the featured one and spans the full width */}
+        <div className={styles.projectsGrid}>
           {projects.map((project, index) => (
             <ProjectCard
               key={project.slug}
               project={project}
-              index={index + 1}
+              featured={index === 0}
             />
           ))}
         </div>
+      </div>
 
-        {/* Sandbox */}
-        <section className={styles.sandboxSection}>
-          <div className={styles.sandboxHeader}>
-            <div className={styles.sandboxIconWrapper}>
-              <VscBeaker className={styles.sandboxIcon} size={20} />
+      {/* Sandbox - smaller experiments, full-width marquee */}
+      <section className={styles.sandboxSection} aria-labelledby="sandbox-title">
+        <div className={styles.sandboxHeader}>
+          <div className={styles.sandboxHeaderTop}>
+            <h2 id="sandbox-title" className={styles.sandboxTitle}>
+              <VscBeaker className={styles.icon} size={22} />
+              Sandbox
+            </h2>
+            <span className={styles.count}>
+              {totalSandbox} {totalSandbox === 1 ? 'experiment' : 'experiments'}
+            </span>
+          </div>
+          <p className={styles.sandboxSubtitle}>
+            Smaller experiments and tools. Hover to pause, click to open.
+          </p>
+        </div>
+
+        <div className={styles.marquee}>
+          {/* Row 1 - scrolls left (the real, focusable links) */}
+          <div
+            className={styles.marqueeTrack}
+            style={{ animationDuration: `${marqueeDuration}s` }}
+          >
+            <div className={styles.marqueeGroup}>
+              {sandboxProjects.map((project) => (
+                <SandboxCard key={project.slug} project={project} />
+              ))}
             </div>
-            <div className={styles.sandboxHeaderText}>
-              <h2 className={styles.sandboxTitle}>Sandbox</h2>
-              <p className={styles.sandboxSubtitle}>
-                Small experiments, early builds, and one-file toys. {totalSandbox}{' '}
-                projects — click any icon to open it.
-              </p>
+            <div className={styles.marqueeGroup} aria-hidden="true">
+              {sandboxProjects.map((project) => (
+                <SandboxCard
+                  key={`dup-${project.slug}`}
+                  project={project}
+                  decorative
+                />
+              ))}
             </div>
           </div>
 
-          <div className={styles.sandboxGrid}>
-            {sandboxProjects.map((project) => (
-              <SandboxCard key={project.slug} project={project} />
-            ))}
+          {/* Row 2 - scrolls right (decorative copy, offset order) */}
+          <div
+            className={`${styles.marqueeTrack} ${styles.marqueeReverse}`}
+            style={{ animationDuration: `${marqueeDuration}s` }}
+            aria-hidden="true"
+          >
+            <div className={styles.marqueeGroup}>
+              {secondRow.map((project) => (
+                <SandboxCard
+                  key={`rev-${project.slug}`}
+                  project={project}
+                  decorative
+                />
+              ))}
+            </div>
+            <div className={styles.marqueeGroup}>
+              {secondRow.map((project) => (
+                <SandboxCard
+                  key={`rev-dup-${project.slug}`}
+                  project={project}
+                  decorative
+                />
+              ))}
+            </div>
           </div>
-        </section>
+        </div>
+      </section>
 
+      <div className={styles.footerWrap}>
         <footer className={styles.footer}>
-          <div className={styles.footerLine} />
+          <p className={styles.footerText}>
+            More of my work, including work in progress, is on GitHub.
+          </p>
           <a
             href="https://github.com/jonathanzietsman"
             target="_blank"

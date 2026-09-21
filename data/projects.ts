@@ -10,7 +10,7 @@ export const projects: Project[] = [
   {
     title: 'vsPortfolio',
     description:
-      'VSCode extension to track and deploy your Coolify applications.',
+      'A developer portfolio disguised as a VS Code window, built with Next.js and TypeScript, featuring a command palette, keyboard navigation, and a dark theme among other features.',
     logo: '/logos/vscode3-svgrepo-com.svg',
     link: 'https://vs-portfolio-snowy.vercel.app/',
     slug: 'vscodeportfolio',

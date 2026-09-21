@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { CSSProperties, PointerEvent } from 'react';
 import type { IconType } from 'react-icons';
 import {
   VscClose,
@@ -71,9 +72,49 @@ const tips: Tip[] = [
   },
 ];
 
+const vars = (v: Record<string, string | number>) => v as CSSProperties;
+
+/** Writes the pointer position (relative to the card) into two CSS variables. */
+const trackPointer = (e: PointerEvent<HTMLElement>) => {
+  const rect = e.currentTarget.getBoundingClientRect();
+  e.currentTarget.style.setProperty('--x', `${e.clientX - rect.left}px`);
+  e.currentTarget.style.setProperty('--y', `${e.clientY - rect.top}px`);
+};
+
+/** True once the element has scrolled into view (fires once). */
+function useInView<T extends Element>(threshold = 0.15) {
+  const ref = useRef<T>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setInView(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          io.disconnect();
+        }
+      },
+      { threshold, rootMargin: '0px 0px -5% 0px' }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [threshold]);
+
+  return [ref, inView] as const;
+}
+
 const HomeTips = () => {
   // null until localStorage has been read, so hidden tips never flash on load
   const [hidden, setHidden] = useState<boolean | null>(null);
+
+  // The wrapper below is always rendered, so the observer can attach on mount
+  const [rootRef, inView] = useInView<HTMLDivElement>();
 
   useEffect(() => {
     try {
@@ -92,71 +133,84 @@ const HomeTips = () => {
     }
   };
 
+  const rootClass = `${styles.root} ${inView ? styles.in : ''}`;
+
   if (hidden === null) {
-    return null;
+    return <div ref={rootRef} className={rootClass} />;
   }
 
   if (hidden) {
     return (
-      <button
-        type="button"
-        className={styles.showButton}
-        onClick={() => updateHidden(false)}
-      >
-        <VscLightbulb size={14} />
-        Show tips
-      </button>
+      <div ref={rootRef} className={rootClass}>
+        <button
+          type="button"
+          className={styles.showButton}
+          onClick={() => updateHidden(false)}
+        >
+          <VscLightbulb size={14} />
+          Show tips
+        </button>
+      </div>
     );
   }
 
   return (
-    <section className={styles.tips} aria-labelledby="home-tips-heading">
-      <div className={styles.header}>
-        <h2 id="home-tips-heading" className={styles.heading}>
-          <VscLightbulb className={styles.headingIcon} size={16} />
-          Things you can try
-        </h2>
-        <button
-          type="button"
-          className={styles.hideButton}
-          onClick={() => updateHidden(true)}
-          aria-label="Hide tips"
-          title="Hide tips"
-        >
-          <VscClose size={16} />
-        </button>
-      </div>
+    <div ref={rootRef} className={rootClass}>
+      <section className={styles.tips} aria-labelledby="home-tips-heading">
+        <div className={styles.header}>
+          <h2 id="home-tips-heading" className={styles.heading}>
+            <VscLightbulb className={styles.headingIcon} size={16} />
+            Things you can try
+          </h2>
+          <button
+            type="button"
+            className={styles.hideButton}
+            onClick={() => updateHidden(true)}
+            aria-label="Hide tips"
+            title="Hide tips"
+          >
+            <VscClose size={16} />
+          </button>
+        </div>
 
-      <div className={styles.grid}>
-        {tips.map(({ icon: Icon, title, description, keys, joiner }) => (
-          <article key={title} className={styles.tip}>
-            <div className={styles.tipHeader}>
-              <Icon className={styles.tipIcon} size={16} />
-              <h3 className={styles.tipTitle}>{title}</h3>
-            </div>
-
-            {keys && (
-              <div className={styles.keys}>
-                {keys.map((key, index) => (
-                  <span key={`${key}-${index}`} className={styles.keyGroup}>
-                    {index > 0 && (
-                      <span className={styles.joiner}>
-                        {joiner === 'then' ? 'then' : '+'}
-                      </span>
-                    )}
-                    <kbd className={styles.key}>{key}</kbd>
-                  </span>
-                ))}
+        <div className={styles.grid}>
+          {tips.map(({ icon: Icon, title, description, keys, joiner }, i) => (
+            <article
+              key={title}
+              className={styles.tip}
+              style={vars({ '--i': i })}
+              onPointerMove={trackPointer}
+            >
+              <div className={styles.tipHeader}>
+                <Icon className={styles.tipIcon} size={16} />
+                <h3 className={styles.tipTitle}>{title}</h3>
               </div>
-            )}
 
-            <p className={styles.tipDescription}>{description}</p>
-          </article>
-        ))}
-      </div>
+              {keys && (
+                <div className={styles.keys}>
+                  {keys.map((key, index) => (
+                    <span key={`${key}-${index}`} className={styles.keyGroup}>
+                      {index > 0 && (
+                        <span className={styles.joiner}>
+                          {joiner === 'then' ? 'then' : '+'}
+                        </span>
+                      )}
+                      <kbd className={styles.key}>{key}</kbd>
+                    </span>
+                  ))}
+                </div>
+              )}
 
-      <p className={styles.note}>On Mac, use ⌘ instead of Ctrl for the shortcuts above.</p>
-    </section>
+              <p className={styles.tipDescription}>{description}</p>
+            </article>
+          ))}
+        </div>
+
+        <p className={styles.note}>
+          On Mac, use ⌘ instead of Ctrl for the shortcuts above.
+        </p>
+      </section>
+    </div>
   );
 };
 

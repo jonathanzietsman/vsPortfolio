@@ -1,8 +1,14 @@
-/* Home Tips - VS Code style walkthrough boxes */
+/* Home Tips - VS Code style walkthrough boxes (with motion) */
+
+.root {
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  width: 100%;
+  margin-top: 8px;
+}
 
 .tips {
   width: 100%;
-  margin-top: 8px;
   text-align: left;
 }
 
@@ -11,6 +17,7 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
+  opacity: 0;
 }
 
 .heading {
@@ -39,12 +46,13 @@
   border-radius: 4px;
   color: rgba(255, 255, 255, 0.4);
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.2s ease;
 }
 
 .hideButton:hover {
   background: rgba(255, 255, 255, 0.07);
   color: rgba(255, 255, 255, 0.9);
+  transform: rotate(90deg);
 }
 
 .hideButton:focus-visible,
@@ -61,6 +69,7 @@
 }
 
 .tip {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -69,6 +78,39 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-left: 2px solid var(--accent-color);
   border-radius: 6px;
+  opacity: 0;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+/* Soft light that follows the cursor inside the box */
+.tip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    220px circle at var(--x, 50%) var(--y, 50%),
+    rgba(var(--accent-color-rgb), 0.12),
+    transparent 70%
+  );
+  transition: opacity 0.3s ease;
+}
+
+.tip:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.035);
+  border-top-color: rgba(var(--accent-color-rgb), 0.35);
+  border-right-color: rgba(var(--accent-color-rgb), 0.35);
+  border-bottom-color: rgba(var(--accent-color-rgb), 0.35);
+}
+
+.tip:hover::before {
+  opacity: 1;
 }
 
 .tipHeader {
@@ -80,6 +122,11 @@
 .tipIcon {
   flex-shrink: 0;
   color: var(--accent-color);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tip:hover .tipIcon {
+  transform: scale(1.25) rotate(-8deg);
 }
 
 .tipTitle {
@@ -123,6 +170,14 @@
   font-family: inherit;
   font-size: 11px;
   color: var(--text-color);
+  transition: transform 0.15s ease, border-color 0.2s ease;
+}
+
+/* Keys press down on hover, like a real keyboard */
+.tip:hover .key {
+  border-color: rgba(var(--accent-color-rgb), 0.5);
+  border-bottom-width: 1px;
+  transform: translateY(1px);
 }
 
 .joiner {
@@ -134,6 +189,7 @@
   margin: 12px 0 0;
   font-size: 11px;
   color: rgba(255, 255, 255, 0.4);
+  opacity: 0;
 }
 
 /* Collapsed state */
@@ -157,9 +213,72 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
+/* ============================
+   Entrance: plays once when the section scrolls into view
+   ============================ */
+
+.in .header {
+  opacity: 1;
+  animation: fadeIn 0.7s var(--ease) backwards;
+}
+
+.in .tip {
+  opacity: 1;
+  animation: tipIn 0.7s var(--ease) backwards;
+  animation-delay: calc(var(--i, 0) * 90ms + 150ms);
+}
+
+.in .note {
+  opacity: 1;
+  animation: fadeIn 0.7s var(--ease) 0.8s backwards;
+}
+
+@keyframes tipIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Reduced motion: show everything, skip movement */
+@media (prefers-reduced-motion: reduce) {
+  .header,
+  .tip,
+  .note {
+    opacity: 1;
+  }
+
+  .in .header,
+  .in .tip,
+  .in .note {
+    animation: none;
+  }
+
+  .tip,
+  .tipIcon,
+  .key,
+  .hideButton {
+    transition: none;
+  }
+
+  .tip:hover,
+  .tip:hover .tipIcon,
+  .tip:hover .key,
+  .hideButton:hover {
+    transform: none;
   }
 }
