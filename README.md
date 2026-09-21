@@ -263,8 +263,8 @@ stateDiagram-v2
     Ready --> Ready: navigate via palette
     Ready --> Ready: navigate via chord (G + key)
 
-    Ready --> TerminalOpen: Ctrl/Cmd + `
-    TerminalOpen --> Ready: Ctrl/Cmd + ` (toggle) or click ✕
+    Ready --> TerminalOpen: Ctrl/Cmd + backtick
+    TerminalOpen --> Ready: Ctrl/Cmd + backtick (toggle) or click close
     TerminalOpen --> TerminalOpen: run command (output appended)
 
     Ready --> PaletteOpen: Ctrl/Cmd + Shift + P
@@ -880,17 +880,17 @@ const res = await fetch(
 ```mermaid
 flowchart TD
     K[KeyDown] --> P{Palette open?}
-    P -- yes --> PK[Palette handles ↑↓ Enter Esc]
-    P -- no --> CT{ctrl/cmd + ` ?}
+    P -- yes --> PK[Palette handles arrows, Enter, Esc]
+    P -- no --> CT{ctrl or cmd plus backtick?}
     CT -- yes --> TT[toggleTerminal]
-    CT -- no --> CP{ctrl/cmd + shift + P ?}
+    CT -- no --> CP{ctrl or cmd plus shift plus P?}
     CP -- yes --> OP[openCommandPalette]
-    CP -- no --> CH{chordKey === 'g' ?}
-    CH -- yes --> NAV[route map h/a/p/c/g/s]
-    CH -- no --> KT{chordKey === 'k' ?}
-    KT -- yes --> PALT[open palette · theme picker]
-    KT -- no --> ARM{key === 'g' or 'k' && target not input?}
-    ARM -- yes --> SET[setChordKey · 2000 ms timer]
+    CP -- no --> CH{chordKey equals g?}
+    CH -- yes --> NAV[route map h a p c g s]
+    CH -- no --> KT{chordKey equals k?}
+    KT -- yes --> PALT[open palette theme picker]
+    KT -- no --> ARM{key is g or k and target not input?}
+    ARM -- yes --> SET[setChordKey then 2000 ms timer]
     ARM -- no --> IGN[ignore]
 ```
 
@@ -898,13 +898,13 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    SCRIPT["<head> inline script"] --> LS[(localStorage['theme'])]
-    LS --> DOM["<html data-theme>"]
+    SCRIPT["head inline script"] --> LS[("localStorage theme")]
+    LS --> DOM["html data-theme attr"]
     SETTINGS["/settings click"] --> DOM
     PALETTE["Palette: Change Color Theme"] --> DOM
-    TERMINAL["Terminal: theme <name>"] --> DOM
-    DOM --> CSS["themes.css<br/>[data-theme='…'] { --vars }"]
-    CSS --> COMP["All components consume var(--accent-color) …"]
+    TERMINAL["Terminal: theme name"] --> DOM
+    DOM --> CSS["themes.css: data-theme variables"]
+    CSS --> COMP["Components consume var(--accent-color)"]
 ```
 
 ### 17.8 · Key Design Decisions & Trade-offs
